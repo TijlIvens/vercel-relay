@@ -1,16 +1,12 @@
 import { kv } from '@vercel/kv';
 import { NextResponse } from 'next/server';
 
-// The context object's type, containing the dynamic route parameters
-type RouteContext = {
-  params: {
-    key: string;
-  };
-};
-
-export async function POST(request: Request, context: RouteContext) {
-  // Extract the key from the context object
-  const { key } = context.params;
+export async function POST(
+  request: Request,
+  // The type for the context object must be defined inline like this:
+  context: { params: Promise<{ key: string }> }
+) {
+  const { key } = await context.params;
   const authHeader = request.headers.get('authorization');
 
   if (authHeader !== `${process.env.API_SECRET_KEY}`) {
@@ -27,9 +23,12 @@ export async function POST(request: Request, context: RouteContext) {
   }
 }
 
-export async function GET(request: Request, context: RouteContext) {
-  // Extract the key from the context object
-  const { key } = context.params;
+export async function GET(
+  request: Request,
+  // Define the type inline for the GET handler as well:
+  context: { params: Promise<{ key: string }> }
+) {
+  const { key } = await context.params;
 
   try {
     const data = await kv.get(key);
