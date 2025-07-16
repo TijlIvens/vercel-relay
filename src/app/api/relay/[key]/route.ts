@@ -1,12 +1,16 @@
 import { kv } from '@vercel/kv';
 import { NextResponse } from 'next/server';
 
-// The POST function now accepts a 'params' object
-export async function POST(
-  request: Request,
-  { params }: { params: { key: string } }
-) {
-  const { key } = params; // Extract the key from the URL
+// The context object's type, containing the dynamic route parameters
+type RouteContext = {
+  params: {
+    key: string;
+  };
+};
+
+export async function POST(request: Request, context: RouteContext) {
+  // Extract the key from the context object
+  const { key } = context.params;
   const authHeader = request.headers.get('authorization');
 
   if (authHeader !== `${process.env.API_SECRET_KEY}`) {
@@ -15,7 +19,7 @@ export async function POST(
 
   try {
     const body = await request.json();
-    await kv.set(key, body); // Use the dynamic key here
+    await kv.set(key, body);
     return NextResponse.json({ message: `Data stored successfully for key: ${key}` });
   } catch (error) {
     console.error(error);
@@ -23,15 +27,12 @@ export async function POST(
   }
 }
 
-// The GET function also accepts the 'params' object
-export async function GET(
-  request: Request, // The request object is still available if needed
-  { params }: { params: { key: string } }
-) {
-  const { key } = params; // Extract the key from the URL
+export async function GET(request: Request, context: RouteContext) {
+  // Extract the key from the context object
+  const { key } = context.params;
 
   try {
-    const data = await kv.get(key); // Use the dynamic key here
+    const data = await kv.get(key);
     if (data === null) {
       return NextResponse.json({ message: `No data found for key: ${key}` }, { status: 404 });
     }
