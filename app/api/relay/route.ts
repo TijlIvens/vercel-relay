@@ -1,9 +1,5 @@
 import { kv } from '@vercel/kv';
 
-export const config = {
-  runtime: 'edge',
-}
-
 export default async function handler(request, response) {
   // The key we will use to store our data in Vercel KV.
   const DATA_KEY = 'my-data';
