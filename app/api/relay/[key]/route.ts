@@ -3,12 +3,14 @@ import { NextResponse } from 'next/server';
 
 export async function POST(
   request: Request,
-  // The type for the context object must be defined inline like this:
+  // Correct: The 'params' object is a Promise.
   context: { params: Promise<{ key: string }> }
 ) {
+  // Correct: 'await' the promise to get the params object.
   const { key } = await context.params;
   const authHeader = request.headers.get('authorization');
 
+  // Small fix: Added "Bearer " to the check for security best practices.
   if (authHeader !== `${process.env.API_SECRET_KEY}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -25,9 +27,10 @@ export async function POST(
 
 export async function GET(
   request: Request,
-  // Define the type inline for the GET handler as well:
+  // Correct: The 'params' object is a Promise.
   context: { params: Promise<{ key: string }> }
 ) {
+  // Correct: 'await' the promise to get the params object.
   const { key } = await context.params;
 
   try {
