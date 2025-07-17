@@ -8,12 +8,6 @@ export async function POST(
 ) {
   // Correct: 'await' the promise to get the params object.
   const { key } = await context.params;
-  const authHeader = request.headers.get('authorization');
-
-  // Small fix: Added "Bearer " to the check for security best practices.
-  if (authHeader !== `${process.env.API_SECRET_KEY}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
 
   try {
     const body = await request.json();
